@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  phoneNumber     String    @unique
+  isPhoneVerified Boolean   @default(false)
+  isKycVerified   Boolean   @default(false)
+  mpinHash        String?
+
+  // Profile & identity
+  email           String?
+  profilePicture  String?
+  cinId           String?   @unique // generated on first set from settings; starts as null
+
+  // Referral & rewards
+  referralCode    String?   @unique // auto-generated on create; backfill for existing users
+  referredById    String?
+  referredBy      User?     @relation("Referrals", fields: [referredById], references: [id])
+  referredUsers   User[]    @relation("Referrals")
+  points          Int       @default(0)
+  lastCheckInAt  DateTime? 
+
+  otps            Otp[]
+  otpsAsReferrer  Otp[]     @relation("OtpReferrer")
+  kyc             KycDetail?
+  kycDraft        KycDraft?
+  businessProfile BusinessProfile?
+  beneficiaries   Beneficiary[]
+  cards           CardDetail[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Otp {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  referrerId String?  
+  referrer   User?    @relation("OtpReferrer", fields: [referrerId], references: [id])
+  kycDraft   KycDraft?
+
+  createdAt  DateTime @default(now())
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum DocumentType {
+  AADHAAR
+  PAN
+}
+
+model KycDetail {
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String       @unique
+
+  fullName       String
+  address        String
+  dob            DateTime
+  gender         Gender
+  documentType   DocumentType
+  documentNumber String
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model KycDraft {
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String       @unique
+
+  otp            Otp          @relation(fields: [otpId], references: [id])
+  otpId          String       @unique
+
+  fullName       String
+  address        String
+  dob            DateTime
+  gender         Gender
+  documentType   DocumentType
+  documentNumber String
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+
+enum BusinessType {
+  SOLE_PROPRIETORSHIP
+  PARTNERSHIP
+  LLP
+  PVT_LTD
+  PUBLIC_LTD
+  REGULAR_TAXPAYER
+  OTHER
+}
+
+enum TurnoverRange {
+  RS_0_TO_6L
+  RS_6L_TO_40L
+  RS_40L_TO_1_20CR
+  RS_1CR_TO_5CR
+  RS_5CR_TO_10CR
+  RS_10CR_TO_50CR
+  RS_ABOVE_50CR
+}
+
+model BusinessProfile {
+  id           String       @id @default(cuid())
+  user         User         @relation(fields: [userId], references: [id])
+  userId       String       @unique
+
+  tradeName    String
+  gstNumber    String
+  businessType BusinessType   @default(REGULAR_TAXPAYER)
+  turnover     TurnoverRange   @default(RS_40L_TO_1_20CR)
+  email        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Beneficiary {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+
+  bankName      String
+  accountNumber String
+  ifscCode      String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CardDetail {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+
+  holderName   String
+  cardNumberEncrypted String 
+  lastFour     String   
+  cvvEncrypted String?  
+  expiryMonth  Int
+  expiryYear   Int
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
