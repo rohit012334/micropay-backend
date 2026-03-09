@@ -16,7 +16,7 @@ export default function AuthPages() {
     e.preventDefault();
     setError("");
     if (!email?.trim() || !password) {
-      const msg = "Email aur password zaroori hain";
+      const msg = "Email aur password Required";
       setError(msg);
       toast.error(msg);
       return;
@@ -27,7 +27,7 @@ export default function AuthPages() {
       setError("");
       toast.success("Login successful");
     } catch (err) {
-      const msg = err?.data?.message || err?.message || "Login fail. Backend check karein ya email/password sahi hai?";
+      const msg = err?.data?.message || err?.message || "Login fail.  check your email/password ";
       setError(msg);
       toast.error(msg);
     } finally {

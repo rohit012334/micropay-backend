@@ -28,7 +28,7 @@ export async function api(endpoint, options = {}) {
   try {
     res = await fetch(url, { ...options, headers });
   } catch (networkErr) {
-    const err = new Error("Network error. Backend chal raha hai? URL check karein.");
+    const err = new Error("Network error. check your internet connection or backend is running.");
     err.data = { message: err.message };
     throw err;
   }

@@ -59,11 +59,11 @@ export default function ManagersPage() {
   const handleAddManager = async (e) => {
     e.preventDefault();
     if (!isAdmin) {
-      toast.error("Sirf Admin naye manager add kar sakta hai");
+      toast.error("Only Admin can add new managers");
       return;
     }
     if (!email.trim() || !password.trim()) {
-      toast.error("Email aur password zaroori hain");
+      toast.error("Email and password required");
       return;
     }
     const body = {
@@ -86,10 +86,10 @@ export default function ManagersPage() {
       setPermissions([]);
       setAddSuccess(true);
       setTimeout(() => setAddSuccess(false), 3000);
-      toast.success("Manager add ho gaya");
+      toast.success("Manager added successfully");
       fetchManagers();
     } catch (err) {
-      toast.error(err?.data?.message || err?.message || "Manager add nahi ho paya");
+      toast.error(err?.data?.message || err?.message || "Failed to add manager");
     }
   };
 
@@ -182,11 +182,10 @@ export default function ManagersPage() {
               {PERMISSION_OPTIONS.map((opt) => (
                 <label
                   key={opt.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition cursor-pointer ${
-                    permissions.includes(opt.id)
-                      ? "bg-primary/5 border-primary/30"
-                      : "bg-secondary/20 border-border hover:bg-secondary/40"
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition cursor-pointer ${permissions.includes(opt.id)
+                    ? "bg-primary/5 border-primary/30"
+                    : "bg-secondary/20 border-border hover:bg-secondary/40"
+                    }`}
                 >
                   <input
                     type="checkbox"
@@ -220,7 +219,7 @@ export default function ManagersPage() {
             className="mt-4 p-4 rounded-lg bg-success/10 border border-success/20 flex items-center gap-3"
           >
             <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-            <p className="text-sm font-medium text-success">Manager account create ho gaya!</p>
+            <p className="text-sm font-medium text-success">Manager account created successfully!</p>
           </motion.div>
         )}
       </div>
