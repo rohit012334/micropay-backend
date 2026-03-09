@@ -14,7 +14,7 @@ router.use(authenticate);
 router.post("/", createBeneficiaryHandler);
 router.get("/", listBeneficiariesHandler);
 router.get("/:id", getBeneficiaryHandler);
-router.put("/:id", updateBeneficiaryHandler);
+router.put("/:id", updateBeneficiaryHandler);   
 router.delete("/:id", deleteBeneficiaryHandler);
 
 

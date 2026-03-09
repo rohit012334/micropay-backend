@@ -2,7 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3, Users, CreditCard, Receipt, Landmark, Settings, LogOut,
-  ChevronLeft, ChevronRight, Search, Bell, ShieldCheck, UserCog
+  ChevronLeft, ChevronRight, Search, Bell, ShieldCheck, UserCog,
+  Layout, ShoppingBag, HelpCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import OverviewPage from "./dashboard/OverviewPage";
@@ -13,6 +14,9 @@ import TaxPage from "./dashboard/TaxPage";
 import SettingsPage from "./dashboard/SettingsPage";
 import NotificationsPage from "./dashboard/NotificationsPage";
 import ManagersPage from "./dashboard/ManagersPage";
+import BannerPage from "./dashboard/BannerPage";
+import ServicesPage from "./dashboard/ServicesPage";
+import FAQPage from "./dashboard/FAQPage";
 
 const allNavItems = [
   { id: "overview", label: "Overview", icon: BarChart3, adminOnly: false },
@@ -22,6 +26,9 @@ const allNavItems = [
   { id: "tax", label: "Tax Payments", icon: Landmark, adminOnly: true },
   { id: "notifications", label: "Notifications", icon: Bell, adminOnly: true },
   { id: "managers", label: "Add Manager", icon: UserCog, adminOnly: true },
+  { id: "banner", label: "Banner", icon: Layout, adminOnly: true },
+  { id: "services", label: "Services", icon: ShoppingBag, adminOnly: true },
+  { id: "faq", label: "FAQ", icon: HelpCircle, adminOnly: true },
   { id: "settings", label: "Settings", icon: Settings, adminOnly: false },
 ];
 
@@ -33,6 +40,9 @@ const pageComponents = {
   tax: TaxPage,
   notifications: NotificationsPage,
   managers: ManagersPage,
+  banner: BannerPage,
+  services: ServicesPage,
+  faq: FAQPage,
   settings: SettingsPage,
 };
 
@@ -44,6 +54,9 @@ const pageTitles = {
   tax: "Tax Payments",
   notifications: "Send Notifications",
   managers: "Add Manager",
+  banner: "Banner Management",
+  services: "Our Products / Services",
+  faq: "FAQ Management",
   settings: "Settings",
 };
 
@@ -92,8 +105,8 @@ export default function Dashboard() {
               key={item.id}
               onClick={() => setActivePage(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activePage === item.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                ? "bg-primary/10 text-primary"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 }`}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />

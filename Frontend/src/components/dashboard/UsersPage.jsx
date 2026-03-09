@@ -183,7 +183,12 @@ export default function UsersPage() {
                 <td className="p-4 text-foreground font-medium">{u.name}</td>
                 <td className="p-4 text-muted-foreground">{u.email}</td>
                 <td className="p-4 text-muted-foreground">{u.phone}</td>
-                <td className="p-4 text-muted-foreground">{u.signupDate}</td>
+                <td className="p-4">
+                  <div className="flex flex-col">
+                    <span className="text-foreground font-medium">{u.signupDate.split(' ')[0]}</span>
+                    <span className="text-[11px] text-muted-foreground">{u.signupDate.split(' ').slice(1).join(' ')}</span>
+                  </div>
+                </td>
                 <td className="p-4">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.isVerified ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                     {u.isVerified ? "✅ Verified" : "❌ Unverified"}

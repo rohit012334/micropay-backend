@@ -4,9 +4,22 @@ import httpStatus from "http-status";
 
 export async function createBeneficiary(userId, data) {
   const { bankName, accountNumber, ifscCode } = data;
+
+  const existing = await prisma.beneficiary.findFirst({
+    where: {
+      userId,
+      accountNumber,
+    },
+  });
+
+  if (existing) {
+    throw new Error("This bank account is already added as a beneficiary.");
+  }
+
   const beneficiary = await prisma.beneficiary.create({
     data: { userId, bankName, accountNumber, ifscCode },
   });
+
   return beneficiary;
 }
 

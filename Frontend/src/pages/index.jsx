@@ -12,10 +12,10 @@ function AppContent() {
   return <Dashboard />;
 }
 
-const index = () => (
+const Index = () => (
   <AuthProvider>
     <AppContent />
   </AuthProvider>
 );
 
-export default index;
+export default Index;

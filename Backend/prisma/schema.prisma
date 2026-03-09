@@ -34,6 +34,9 @@ model User {
   businessProfile BusinessProfile?
   beneficiaries   Beneficiary[]
   cards           CardDetail[]
+  wallet          Wallet?
+  idempotencyKeys IdempotencyKey[]
+  refreshTokens   RefreshToken[]
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -143,8 +146,78 @@ model Beneficiary {
   accountNumber String
   ifscCode      String
 
+  payoutTransactions WalletTransaction[]
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// ---- Wallet (balance + ledger) ----
+enum TransactionType {
+  W2W_TRANSFER
+  BANK_PAYOUT
+}
+
+enum TransactionStatus {
+  COMPLETED
+  FAILED
+  PENDING
+}
+
+enum LedgerEntryType {
+  DEBIT
+  CREDIT
+}
+
+enum LedgerRefType {
+  W2W_TRANSFER_OUT
+  W2W_TRANSFER_IN
+  BANK_PAYOUT
+}
+
+model Wallet {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balancePaise Int      @default(0)
+  version      Int      @default(0)
+
+  transactionsFrom WalletTransaction[] @relation("FromWallet")
+  transactionsTo   WalletTransaction[] @relation("ToWallet")
+  ledgerEntries   LedgerEntry[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WalletTransaction {
+  id             String            @id @default(cuid())
+  type           TransactionType
+  amountPaise    Int
+  status         TransactionStatus @default(COMPLETED)
+  idempotencyKey String?           @unique
+  fromWalletId   String
+  fromWallet     Wallet            @relation("FromWallet", fields: [fromWalletId], references: [id], onDelete: Restrict)
+  toWalletId     String?
+  toWallet       Wallet?           @relation("ToWallet", fields: [toWalletId], references: [id], onDelete: SetNull)
+  beneficiaryId  String?
+  beneficiary    Beneficiary?      @relation(fields: [beneficiaryId], references: [id], onDelete: SetNull)
+  ledgerEntries  LedgerEntry[]
+
+  createdAt      DateTime         @default(now())
+}
+
+model LedgerEntry {
+  id               String         @id @default(cuid())
+  walletId         String
+  wallet           Wallet         @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  transactionId    String?
+  transaction      WalletTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  entryType        LedgerEntryType
+  amountPaise      Int
+  balanceAfterPaise Int
+  refType          LedgerRefType
+  createdAt        DateTime       @default(now())
 }
 
 model CardDetail {
@@ -163,3 +236,81 @@ model CardDetail {
   updatedAt    DateTime @updatedAt
 }
 
+
+model IdempotencyKey {
+  id           String   @id @default(cuid())
+  key          String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestHash  String
+  responseBody Json?
+  statusCode   Int?
+  status       String   @default("processing") // processing | completed | failed
+  expiresAt    DateTime @default(dbgenerated("(NOW() + INTERVAL '24 hours')"))
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, key])
+  @@index([userId, key])
+  @@index([expiresAt])
+  @@map("idempotency_keys")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
+enum StaffRole {
+  ADMIN
+  MANAGER
+}
+
+model Staff {
+  id              String       @id @default(cuid())
+  name            String
+  email           String       @unique
+  password        String
+  role            StaffRole    @default(MANAGER)
+
+  // Manager specific permissions
+  canManageUsers    Boolean @default(false)
+  canManageCards    Boolean @default(false)
+  canViewBills      Boolean @default(false)
+  canViewTaxes      Boolean @default(false)
+  canManageBanners  Boolean @default(false)
+  canManageFAQs     Boolean @default(false)
+  canSendNotifications Boolean @default(false)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("staff")
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+model Banner {
+  id          String   @id @default(cuid())
+  type        String   // Hero, Promotion, etc.
+  title       String
+  description String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("banners")
+}

@@ -39,12 +39,12 @@ export async function loginuser(phoneNumber, countryCode, mpin) {
   const user = await prisma.user.findUnique({
     where: { phoneNumber: fullPhone },
   });
-  
-  if(!user){
+
+  if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  if(!user.isPhoneVerified){
+  if (!user.isPhoneVerified) {
     throw new ApiError(httpStatus.NOT_FOUND, "User is not verified");
   }
 
@@ -53,15 +53,25 @@ export async function loginuser(phoneNumber, countryCode, mpin) {
   }
 
   const isMatch = await bcrypt.compare(mpin, user.mpinHash);
-  if(!isMatch){
+  if (!isMatch) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Invalid MPIN");
   }
 
   const token = jwt.sign(
     { userId: user.id },
     env.jwtSecret,
-    { expiresIn: env.jwtExpiry }
+    { expiresIn: "7d" }
   );
+
+  // Store token in DB for session verification
+  await prisma.refreshToken.create({
+    data: {
+      token,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
+  });
+
   return { phoneNumber: fullPhone, token, userId: user.id };
 }
 
@@ -305,7 +315,7 @@ export async function resetMpinForPhone(phoneNumber, mpin, countryCode = "+91") 
     where: { phoneNumber: fullPhone },
   });
 
-  if(!user){
+  if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found for this phone number");
   }
 
@@ -317,6 +327,17 @@ export async function resetMpinForPhone(phoneNumber, mpin, countryCode = "+91") 
   });
 
   return { phoneNumber: fullPhone };
+}
+
+export async function logoutUser(token) {
+  try {
+    await prisma.refreshToken.delete({
+      where: { token },
+    });
+    return { success: true };
+  } catch (err) {
+    return { success: true };
+  }
 }
 
 

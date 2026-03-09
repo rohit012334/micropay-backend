@@ -7,8 +7,25 @@ export async function addCard(userId, data) {
   const { holderName, cardNumber, cvv, expiryMonth, expiryYear } = data;
   const cardNumberStr = String(cardNumber).replace(/\s/g, "");
   const lastFour = cardNumberStr.slice(-4);
+
+  const existing = await prisma.cardDetail.findFirst({
+    where: {
+      userId,
+      lastFour,
+      expiryMonth: Number(expiryMonth),
+      expiryYear: Number(expiryYear),
+    },
+  });
+
+  if (existing) {
+    const error = new Error("Card already added");
+    error.statusCode = 409;
+    throw error;
+  }
+
   const cardNumberEncrypted = encrypt(cardNumberStr);
   const cvvEncrypted = cvv ? encrypt(String(cvv)) : null;
+
   const card = await prisma.cardDetail.create({
     data: {
       userId,
@@ -20,6 +37,7 @@ export async function addCard(userId, data) {
       expiryYear: Number(expiryYear),
     },
   });
+
   return maskCard(card);
 }
 

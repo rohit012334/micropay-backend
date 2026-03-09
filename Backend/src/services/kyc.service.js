@@ -4,11 +4,12 @@ import env from "../config/env.js";
 import { getSmsClient } from "../sms/smsClientFactory.js";
 import ApiError from "../utils/ApiError.js";
 import httpStatus from "http-status";
+import { getOrCreateWalletInTx } from "./wallet.service.js";
 
 const OTP_SALT_ROUNDS = 10;
 
 function generateOtp() {
-  return "1234"; 
+  return "1234";
 }
 
 async function upsertKycDetailForUserId(
@@ -34,12 +35,12 @@ async function upsertKycDetailForUserId(
 
   return existingKyc
     ? tx.kycDetail.update({
-        where: { userId },
-        data,
-      })
+      where: { userId },
+      data,
+    })
     : tx.kycDetail.create({
-        data,
-      });
+      data,
+    });
 }
 
 
@@ -160,7 +161,7 @@ export async function submitKycDetailsAndSendOtp({
   return {
     phoneNumber: fullPhone,
     expiresAt,
-    otp, 
+    otp,
   };
 }
 
@@ -265,6 +266,9 @@ export async function verifyKycOtpAndComplete({
     await tx.kycDraft.delete({
       where: { userId: user.id },
     });
+
+    // Automatically create wallet after KYC verification
+    await getOrCreateWalletInTx(tx, user.id);
 
     return kyc;
   });

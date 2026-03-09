@@ -3,7 +3,7 @@ import { prisma } from "../config/prismaClient.js";
 import ApiError from "../utils/ApiError.js";
 
 export async function upsertBusinessProfile(userId, data) {
-  const { tradeName, gstNumber, businessType, email ,  turnover } = data;
+   const { tradeName, gstNumber, businessType, email ,  turnover } = data;
 
    const existingEmail = await prisma.businessProfile.findFirst({
     where: { email, NOT: { userId } },

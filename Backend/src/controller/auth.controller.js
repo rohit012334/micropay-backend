@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-import {sendOtpForPhone,verifyOtpForPhone,setupMpinForPhone,sendOtpForForgetMpin,ForgetverifyOtpForPhone,loginuser,resetMpinForPhone}from "../services/auth.service.js";
+import { sendOtpForPhone, verifyOtpForPhone, setupMpinForPhone, sendOtpForForgetMpin, ForgetverifyOtpForPhone, loginuser, resetMpinForPhone, logoutUser } from "../services/auth.service.js";
 import { validate } from "../middleware/validate.js";
-import {sendOtpSchema,verifyOtpSchema,setupMpinSchema,forgetMpinSchema,ForgetverifyOtpSchema,loginSchema,resetMpinSchema} from "../validation/auth.validation.js";
+import { sendOtpSchema, verifyOtpSchema, setupMpinSchema, forgetMpinSchema, ForgetverifyOtpSchema, loginSchema, resetMpinSchema } from "../validation/auth.validation.js";
 
 
 
@@ -9,7 +9,7 @@ export const login = [
   validate(loginSchema),
   async (req, res, next) => {
     try {
-      const { phoneNumber, countryCode , mpin } = req.body;
+      const { phoneNumber, countryCode, mpin } = req.body;
       const result = await loginuser(phoneNumber, countryCode, mpin);
 
       return res.status(200).json({
@@ -22,10 +22,10 @@ export const login = [
         },
       });
     }
-  
-  catch (err) {
-    return next(err);
-  }
+
+    catch (err) {
+      return next(err);
+    }
   },
 ];
 
@@ -87,13 +87,13 @@ export const forgetMpin = [
     try {
       const { phoneNumber, countryCode } = req.body;
       const result = await sendOtpForForgetMpin(phoneNumber, countryCode);
-      
+
       return res
         .status(200)
         .json({
           status: true,
           message: "OTP sent successfully",
-          otp: result.otp,   
+          otp: result.otp,
         });
     } catch (err) {
       return next(err);
@@ -135,5 +135,20 @@ export const resetMpin = [
   },
 ];
 
+export const logout = [
+  async (req, res, next) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader.slice(7);
+      await logoutUser(token);
+      return res.status(httpStatus.OK).json({
+        success: true,
+        message: "Logout successful",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
 
 export const resend = sendOtp

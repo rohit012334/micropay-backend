@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.post("/", upsertBusinessProfileHandler);
+router.post("/", upsertBusinessProfileHandler); 
 router.get("/", getBusinessProfileHandler);
 
 export default router;

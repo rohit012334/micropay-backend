@@ -15,11 +15,11 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/profile", getProfileHandler);
-router.put("/profile", updateProfileHandler);
+router.put("/profile", updateProfileHandler); 
 router.get("/account-details", getAccountDetailsHandler);
 router.get("/referral-code", getReferralCodeHandler);
 router.get("/points", getPointsHandler);
 router.post("/check-in", checkInHandler);
-router.get("/referrals", getReferralsHandler);   //testing pending
+router.get("/referrals", getReferralsHandler);
 
 export default router;

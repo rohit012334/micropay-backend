@@ -1,21 +1,21 @@
 // Dummy data for the admin dashboard
 
 export const DUMMY_USERS = [
-  { id: 1, name: "Aarav Sharma", email: "aarav.sharma@gmail.com", phone: "+91 98765 43210", signupDate: "2024-01-15", isVerified: true, status: "Active" },
-  { id: 2, name: "Priya Patel", email: "priya.patel@outlook.com", phone: "+91 87654 32109", signupDate: "2024-01-18", isVerified: true, status: "Active" },
-  { id: 3, name: "Rohan Gupta", email: "rohan.gupta@yahoo.com", phone: "+91 76543 21098", signupDate: "2024-02-01", isVerified: false, status: "Active" },
-  { id: 4, name: "Sneha Reddy", email: "sneha.reddy@gmail.com", phone: "+91 65432 10987", signupDate: "2024-02-10", isVerified: true, status: "Active" },
-  { id: 5, name: "Vikram Singh", email: "vikram.singh@hotmail.com", phone: "+91 54321 09876", signupDate: "2024-02-15", isVerified: true, status: "inActive" },
-  { id: 6, name: "Ananya Iyer", email: "ananya.iyer@gmail.com", phone: "+91 43210 98765", signupDate: "2024-02-20", isVerified: false, status: "Active" },
-  { id: 7, name: "Karthik Nair", email: "karthik.nair@gmail.com", phone: "+91 32109 87654", signupDate: "2024-03-01", isVerified: true, status: "Active" },
-  { id: 8, name: "Meera Joshi", email: "meera.joshi@outlook.com", phone: "+91 21098 76543", signupDate: "2024-03-05", isVerified: true, status: "Active" },
-  { id: 9, name: "Arjun Verma", email: "arjun.verma@gmail.com", phone: "+91 10987 65432", signupDate: "2024-03-10", isVerified: false, status: "inActive" },
-  { id: 10, name: "Divya Menon", email: "divya.menon@yahoo.com", phone: "+91 98712 34567", signupDate: "2024-03-15", isVerified: true, status: "Active" },
-  { id: 11, name: "Rahul Deshmukh", email: "rahul.desh@gmail.com", phone: "+91 87612 34567", signupDate: "2024-03-20", isVerified: true, status: "Active" },
-  { id: 12, name: "Kavitha Rao", email: "kavitha.rao@gmail.com", phone: "+91 76512 34567", signupDate: "2024-04-01", isVerified: false, status: "Active" },
-  { id: 13, name: "Siddharth Malhotra", email: "sid.malhotra@outlook.com", phone: "+91 65412 34567", signupDate: "2024-04-05", isVerified: true, status: "Active" },
-  { id: 14, name: "Neha Kapoor", email: "neha.kapoor@gmail.com", phone: "+91 54312 34567", signupDate: "2024-04-10", isVerified: true, status: "inActive" },
-  { id: 15, name: "Aditya Banerjee", email: "aditya.ban@gmail.com", phone: "+91 43212 34567", signupDate: "2024-04-15", isVerified: false, status: "Active" },
+  { id: 1, name: "Aarav Sharma", email: "aarav.sharma@gmail.com", phone: "+91 98765 43210", signupDate: "2024-01-15 10:30 AM", isVerified: true, status: "Active" },
+  { id: 2, name: "Priya Patel", email: "priya.patel@outlook.com", phone: "+91 87654 32109", signupDate: "2024-01-18 02:45 PM", isVerified: true, status: "Active" },
+  { id: 3, name: "Rohan Gupta", email: "rohan.gupta@yahoo.com", phone: "+91 76543 21098", signupDate: "2024-02-01 09:15 AM", isVerified: false, status: "Active" },
+  { id: 4, name: "Sneha Reddy", email: "sneha.reddy@gmail.com", phone: "+91 65432 10987", signupDate: "2024-02-10 11:20 AM", isVerified: true, status: "Active" },
+  { id: 5, name: "Vikram Singh", email: "vikram.singh@hotmail.com", phone: "+91 54321 09876", signupDate: "2024-02-15 04:50 PM", isVerified: true, status: "inActive" },
+  { id: 6, name: "Ananya Iyer", email: "ananya.iyer@gmail.com", phone: "+91 43210 98765", signupDate: "2024-02-20 01:10 PM", isVerified: false, status: "Active" },
+  { id: 7, name: "Karthik Nair", email: "karthik.nair@gmail.com", phone: "+91 32109 87654", signupDate: "2024-03-01 08:35 AM", isVerified: true, status: "Active" },
+  { id: 8, name: "Meera Joshi", email: "meera.joshi@outlook.com", phone: "+91 21098 76543", signupDate: "2024-03-05 12:00 PM", isVerified: true, status: "Active" },
+  { id: 9, name: "Arjun Verma", email: "arjun.verma@gmail.com", phone: "+91 10987 65432", signupDate: "2024-03-10 03:25 PM", isVerified: false, status: "inActive" },
+  { id: 10, name: "Divya Menon", email: "divya.menon@yahoo.com", phone: "+91 98712 34567", signupDate: "2024-03-15 10:05 AM", isVerified: true, status: "Active" },
+  { id: 11, name: "Rahul Deshmukh", email: "rahul.desh@gmail.com", phone: "+91 87612 34567", signupDate: "2024-03-20 05:40 PM", isVerified: true, status: "Active" },
+  { id: 12, name: "Kavitha Rao", email: "kavitha.rao@gmail.com", phone: "+91 76512 34567", signupDate: "2024-04-01 09:50 AM", isVerified: false, status: "Active" },
+  { id: 13, name: "Siddharth Malhotra", email: "sid.malhotra@outlook.com", phone: "+91 65412 34567", signupDate: "2024-04-05 02:15 PM", isVerified: true, status: "Active" },
+  { id: 14, name: "Neha Kapoor", email: "neha.kapoor@gmail.com", phone: "+91 54312 34567", signupDate: "2024-04-10 11:30 AM", isVerified: true, status: "inActive" },
+  { id: 15, name: "Aditya Banerjee", email: "aditya.ban@gmail.com", phone: "+91 43212 34567", signupDate: "2024-04-15 04:00 PM", isVerified: false, status: "Active" },
 ];
 
 // Placeholder document images (demo) – in production use real uploaded URLs

@@ -10,7 +10,10 @@ import userRoutes from "./src/routes/user.routes.js";
 import businessProfileRoutes from "./src/routes/businessProfile.routes.js";
 import beneficiaryRoutes from "./src/routes/beneficiary.routes.js";
 import cardRoutes from "./src/routes/card.routes.js";
+import walletRoutes from "./src/routes/wallet.routes.js";
+import staffRoutes from "./src/routes/staff.routes.js";
 import { errorHandler } from "./src/middleware/errorHandler.js";
+import { cleanupExpiredKeys, cleanupOldOtps, cleanupOldSessions } from "./src/jobs/cleanup.jobs.js";
 
 const app = express();
 
@@ -19,7 +22,7 @@ app.use(cors({ origin: env.clientUrl, credentials: true }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads")); // ✅ image URL access hogi
+app.use("/uploads", express.static("uploads")); 
 
 app.use("/api/auth", authRoutes);
 app.use("/api/kyc", kycRoutes);
@@ -27,6 +30,8 @@ app.use("/api/user", userRoutes);
 app.use("/api/business-profile", businessProfileRoutes);
 app.use("/api/beneficiaries", beneficiaryRoutes);
 app.use("/api/cards", cardRoutes);
+app.use("/api/wallet", walletRoutes);
+app.use("/api/staff", staffRoutes);
 
 app.use(errorHandler);
 
@@ -56,6 +61,16 @@ async function start() {
     }
     process.exit(1);
   });
+
+  // Background Jobs
+  setInterval(cleanupExpiredKeys, 6 * 60 * 60 * 1000); // Every 6 hours
+  setInterval(cleanupOldOtps, 12 * 60 * 60 * 1000); // Every 12 hours
+  setInterval(cleanupOldSessions, 24 * 60 * 60 * 1000); // Every 24 hours
+
+  // Initial cleanup on start
+  cleanupExpiredKeys();
+  cleanupOldOtps();
+  cleanupOldSessions();
 
 }
 
