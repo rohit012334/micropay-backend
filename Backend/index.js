@@ -18,6 +18,8 @@ import { cleanupExpiredKeys, cleanupOldOtps, cleanupOldSessions } from "./src/jo
 const app = express();
 
 app.use(helmet());
+
+// ✅ CORS config
 const allowedOrigins = [
   ...(env.clientUrl ? env.clientUrl.split(",").map((u) => u.trim()).filter(Boolean) : []),
   "http://localhost:5173",
@@ -25,7 +27,23 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:3000",
 ].filter(Boolean);
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("CORS blocked origin:", origin); // ← Railway logs mein dikhega
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
