@@ -18,7 +18,15 @@ import { cleanupExpiredKeys, cleanupOldOtps, cleanupOldSessions } from "./src/jo
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: env.clientUrl, credentials: true }));
+// CORS: sirf website (browser). Flutter app native hai, is list ki zaroorat nahi.
+const allowedOrigins = [
+  ...(env.clientUrl ? env.clientUrl.split(",").map((u) => u.trim()).filter(Boolean) : []),
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000",
+].filter(Boolean);
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

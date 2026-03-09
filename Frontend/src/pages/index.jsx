@@ -3,12 +3,18 @@ import AuthPages from "@/components/AuthPages";
 import Dashboard from "@/components/Dashboard";
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!user) {
-    return <AuthPages onAuth={() => {}} />;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
   }
-
+  if (!user) {
+    return <AuthPages />;
+  }
   return <Dashboard />;
 }
 
