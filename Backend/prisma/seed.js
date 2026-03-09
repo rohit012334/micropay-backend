@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
     const adminEmail = "admin@micrope.com";
     const adminName = "System Admin";
-    const password = "admin_password_123"; // USER should change this later
+    const password = "admin123"; // USER should change this later
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
