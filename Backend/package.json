@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build": "prisma generate",
-    "start": "prisma migrate deploy && node index.js",
-    "postinstall": "prisma generate"
-  },
+"scripts": {
+  "build": "prisma generate",
+  "start": "prisma migrate deploy && node index.js",
+  "dev": "prisma migrate deploy && node --watch index.js",
+  "postinstall": "prisma generate",
+  "studio": "prisma studio"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

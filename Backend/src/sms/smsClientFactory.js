@@ -1,70 +1,68 @@
-import env from "../config/env.js";
+import axios from "axios";
 
 function createDummySmsClient() {
   return {
-    async sendSms(to, message) {
+    async sendSms(to, message, options = {}) {
       console.log(`[SMS dummy] To: ${to}, Message: ${message}`);
       return {};
     },
   };
 }
 
-async function createTwilioSmsClient() {
-  try {
-    const twilio = await import("twilio");
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
-    if (!accountSid || !authToken || !fromNumber) {
-      console.warn("Twilio: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER required. Using dummy.");
-      return createDummySmsClient();
-    }
-    const client = twilio.default(accountSid, authToken);
-    return {
-      async sendSms(to, message) {
-        await client.messages.create({ body: message, from: fromNumber, to });
-        return {};
-      },
-    };
-  } catch (e) {
-    console.warn("Twilio not available:", e.message, "- using dummy SMS");
-    return createDummySmsClient();
-  }
-}
+function createIcpaasSmsClient() {
+  const apiKey = process.env.ICPAAS_API_KEY;
+  const senderId = process.env.ICPAAS_SENDER_ID;
+  const peId = process.env.ICPAAS_PE_ID;
 
-async function createAwsSnsClient() {
-  try {
-    const { SNSClient, PublishCommand } = await import("@aws-sdk/client-sns");
-    const region = process.env.AWS_REGION || "ap-south-1";
-    const client = new SNSClient({ region });
-    return {
-      async sendSms(to, message) {
-        await client.send(
-          new PublishCommand({
-            PhoneNumber: to,
-            Message: message,
-          })
-        );
-        return {};
-      },
-    };
-  } catch (e) {
-    console.warn("AWS SNS not available:", e.message, "- using dummy SMS");
+  if (!apiKey || !senderId || !peId) {
+    console.warn("iCPaaS: credentials missing — using dummy SMS");
     return createDummySmsClient();
   }
+
+  return {
+    async sendSms(to, message, options = {}) {
+      try {
+        const response = await axios.post(
+          "https://icpaas.in/api/v1/sms/mt",
+          {
+            senderId,
+            peId,
+            dltTemplateId: options.dltTemplateId || "",
+            text: message,
+            numbers: [to],
+            dcs: 0,
+            flashSms: 0,
+            schedTime: "",
+            groupId: "",
+            chainValue: "",
+            messageId: "",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiKey}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("iCPaaS SMS failed:", error.response?.data || error.message);
+        throw error;
+      }
+    },
+  };
 }
 
 let cachedClient = null;
 
 export async function getSmsClient() {
   if (cachedClient) return cachedClient;
-  const provider = (env.smsProvider || "dummy").toLowerCase();
-  if (provider === "twilio") {
-    cachedClient = await createTwilioSmsClient();
-  } else if (provider === "aws_sns") {
-    cachedClient = await createAwsSnsClient();
-  } else {
-    cachedClient = createDummySmsClient();
-  }
+
+  const provider = (process.env.SMS_PROVIDER || "dummy").toLowerCase();
+
+  cachedClient = provider === "icpaas"
+    ? createIcpaasSmsClient()
+    : createDummySmsClient();
+
   return cachedClient;
 }

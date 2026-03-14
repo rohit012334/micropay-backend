@@ -6,6 +6,7 @@ const router = express.Router();
 
 /** Public login */
 router.post("/login", staffController.staffLogin);
+router.post("/change-password", authenticateStaff, staffController.changePassword);
 
 /** Staff Profile (Self) */
 router.get("/me", authenticateStaff, staffController.getStaffProfile);
@@ -16,16 +17,26 @@ router.get("/managers", authenticateStaff, authorize('ADMIN'), staffController.l
 router.delete("/managers/:id", authenticateStaff, authorize('ADMIN'), staffController.deleteManager);
 
 /** Management: FAQs */
-router.get("/faqs", authenticateStaff, staffController.listFaqs); // Accessible for view by anyone, manage protected
+router.get("/faqs", authenticateStaff, staffController.listFaqs);
 router.post("/faqs", authenticateStaff, authorize('canManageFAQs'), staffController.createFaq);
 router.post("/faqs/bulk", authenticateStaff, authorize('canManageFAQs'), staffController.bulkCreateFaqs);
 router.put("/faqs/:id", authenticateStaff, authorize('canManageFAQs'), staffController.updateFaq);
 router.delete("/faqs/:id", authenticateStaff, authorize('canManageFAQs'), staffController.deleteFaq);
 
 /** Management: Banners */
-router.get("/banners", authenticateStaff, staffController.listBanners);
 router.post("/banners", authenticateStaff, authorize('canManageBanners'), staffController.createBanner);
 router.delete("/banners/:id", authenticateStaff, authorize('canManageBanners'), staffController.deleteBanner);
+
+/** Management: Categories */
+router.post("/categories", authenticateStaff, authorize('canManageProducts'), staffController.createCategory);
+router.put("/categories/:id", authenticateStaff, authorize('canManageProducts'), staffController.updateCategory);
+router.delete("/categories/:id", authenticateStaff, authorize('canManageProducts'), staffController.deleteCategory);
+
+/** Management: Products */
+router.post("/products", authenticateStaff, authorize('canManageProducts'), staffController.createProduct);
+router.put("/products/:id", authenticateStaff, authorize('canManageProducts'), staffController.updateProduct);
+router.delete("/products/:id", authenticateStaff, authorize('canManageProducts'), staffController.deleteProduct);
+
 
 // NOTE: Add other role protections for manage users, cards, etc.
 // For example:

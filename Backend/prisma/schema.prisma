@@ -14,7 +14,7 @@ model User {
   isKycVerified   Boolean   @default(false)
   mpinHash        String?
 
-  // Profile & identity
+  // Profile & identity (name comes from KYC fullName)
   email           String?
   profilePicture  String?
   cinId           String?   @unique // generated on first set from settings; starts as null
@@ -43,15 +43,16 @@ model User {
 }
 
 model Otp {
-  id         String   @id @default(cuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  codeHash   String
-  expiresAt  DateTime
-  consumedAt DateTime?
-  referrerId String?  
-  referrer   User?    @relation("OtpReferrer", fields: [referrerId], references: [id])
-  kycDraft   KycDraft?
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  codeHash        String
+  expiresAt       DateTime
+  consumedAt      DateTime?
+  referrerId      String?
+  referrer        User?    @relation("OtpReferrer", fields: [referrerId], references: [id])
+  newPhoneNumber  String?  // for phone-change verification
+  kycDraft        KycDraft?
 
   createdAt  DateTime @default(now())
 }
@@ -285,6 +286,7 @@ model Staff {
   canViewTaxes      Boolean @default(false)
   canManageBanners  Boolean @default(false)
   canManageFAQs     Boolean @default(false)
+  canManageProducts Boolean @default(false)
   canSendNotifications Boolean @default(false)
 
   createdAt       DateTime     @default(now())
@@ -314,3 +316,29 @@ model Banner {
 
   @@map("banners")
 }
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  imageUrl  String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  price       Float
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+

@@ -13,6 +13,16 @@ export async function staffLogin(req, res, next) {
     }
 }
 
+export async function changePassword(req, res, next) {
+    try {
+        const result = await staffService.changeStaffPassword(req.staff.id, req.body);
+        res.status(httpStatus.OK).json({ success: true, ...result });
+    } catch (err) {
+        next(err);
+    }
+}
+
+
 /** Admin: Add Manager */
 export async function addManager(req, res, next) {
     try {
@@ -116,6 +126,90 @@ export async function deleteBanner(req, res, next) {
         next(err);
     }
 }
+
+/** Category Management */
+export async function listCategories(req, res, next) {
+    try {
+        const categories = await managementService.getAllCategories();
+        res.status(httpStatus.OK).json({ success: true, data: categories });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function createCategory(req, res, next) {
+    try {
+        const category = await managementService.createCategory(req.body);
+        res.status(httpStatus.CREATED).json({ success: true, message: "Category created", data: category });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function updateCategory(req, res, next) {
+    try {
+        const category = await managementService.updateCategory(req.params.id, req.body);
+        res.status(httpStatus.OK).json({ success: true, message: "Category updated", data: category });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function deleteCategory(req, res, next) {
+    try {
+        await managementService.deleteCategory(req.params.id);
+        res.status(httpStatus.OK).json({ success: true, message: "Category deleted" });
+    } catch (err) {
+        next(err);
+    }
+}
+
+/** Product Management */
+export async function listProducts(req, res, next) {
+    try {
+        const products = await managementService.getAllProducts();
+        res.status(httpStatus.OK).json({ success: true, data: products });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function listProductsByCategory(req, res, next) {
+    try {
+        const products = await managementService.getProductsByCategory(req.params.categoryId);
+        res.status(httpStatus.OK).json({ success: true, data: products });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function createProduct(req, res, next) {
+    try {
+        const product = await managementService.createProduct(req.body);
+        res.status(httpStatus.CREATED).json({ success: true, message: "Product created", data: product });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function updateProduct(req, res, next) {
+    try {
+        const product = await managementService.updateProduct(req.params.id, req.body);
+        res.status(httpStatus.OK).json({ success: true, message: "Product updated", data: product });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function deleteProduct(req, res, next) {
+    try {
+        await managementService.deleteProduct(req.params.id);
+        res.status(httpStatus.OK).json({ success: true, message: "Product deleted" });
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 /** Staff Profile Meta (Self-check for permissions) */
 export async function getStaffProfile(req, res, next) {

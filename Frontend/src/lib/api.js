@@ -48,6 +48,8 @@ export async function api(endpoint, options = {}) {
 export const staffApi = {
   login: (email, password) =>
     api("/api/staff/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+  changePassword: (data) =>
+    api("/api/staff/change-password", { method: "POST", body: JSON.stringify(data) }),
   me: () => api("/api/staff/me"),
   logout: () => setToken(null),
 };

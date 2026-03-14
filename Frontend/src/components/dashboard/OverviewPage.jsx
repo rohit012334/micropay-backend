@@ -1,7 +1,10 @@
+// src/pages/admin/OverviewPage.jsx
+
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Users, UserCheck, CreditCard, FileWarning } from "lucide-react";
 import { DUMMY_USERS, DUMMY_BILLS } from "@/data/dummyData";
+import ExportButton from "@/lib/ExportButton";
 
 function CountUp({ target, duration = 1500 }) {
   const [count, setCount] = useState(0);
@@ -33,10 +36,57 @@ const stats = [
 const recentSignups = DUMMY_USERS.slice(0, 5);
 const recentTransactions = DUMMY_BILLS.slice(0, 5);
 
+// ── Column Definitions for Export ─────────────────────────────────────────────
+const userColumns = [
+  { header: "Name",        key: "name" },
+  { header: "Email",       key: "email" },
+  { header: "Phone",       key: "phone" },
+  { header: "Signup Date", key: "signupDate" },
+  { header: "Verified",    key: "isVerified" },
+];
+
+const transactionColumns = [
+  { header: "User",     key: "userName" },
+  { header: "Category", key: "category" },
+  { header: "Amount",   key: "amount" },
+  { header: "Status",   key: "status" },
+  { header: "Date",     key: "date" },
+];
+
 export default function OverviewPage() {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-6">
-      {/* Stat Cards */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      {/* ── Page Header with Export ──────────────────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-heading font-bold text-foreground">Overview</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Dashboard summary — {new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}
+          </p>
+        </div>
+
+        {/* Export all data button */}
+        <ExportButton
+          data={[
+            ...DUMMY_USERS.map((u) => ({ ...u, _type: "user" })),
+          ]}
+          filename={`micropay-overview-${new Date().toISOString().split("T")[0]}`}
+          title="MicroPay — Overview Report"
+          columns={[
+            { header: "Name",        key: "name" },
+            { header: "Email",       key: "email" },
+            { header: "Signup Date", key: "signupDate" },
+            { header: "Verified",    key: "isVerified" },
+          ]}
+        />
+      </div>
+
+      {/* ── Stat Cards ───────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s, i) => (
           <motion.div
@@ -58,18 +108,29 @@ export default function OverviewPage() {
               </div>
             </div>
             <div className="flex items-center gap-1 mt-3 text-xs">
-              {s.up ? <TrendingUp className="w-3 h-3 text-success" /> : <TrendingDown className="w-3 h-3 text-warning" />}
+              {s.up
+                ? <TrendingUp className="w-3 h-3 text-success" />
+                : <TrendingDown className="w-3 h-3 text-warning" />}
               <span className={s.up ? "text-success" : "text-warning"}>{s.trend}</span>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Tables */}
+      {/* ── Tables ───────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
         {/* Recent Signups */}
         <div className="glass-card p-5">
-          <h3 className="font-heading font-semibold text-foreground mb-4">Recent Signups</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-semibold text-foreground">Recent Signups</h3>
+            <ExportButton
+              data={DUMMY_USERS}
+              filename="recent-signups"
+              title="MicroPay — Recent Signups"
+              columns={userColumns}
+            />
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -100,7 +161,15 @@ export default function OverviewPage() {
 
         {/* Recent Transactions */}
         <div className="glass-card p-5">
-          <h3 className="font-heading font-semibold text-foreground mb-4">Recent Transactions</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-semibold text-foreground">Recent Transactions</h3>
+            <ExportButton
+              data={DUMMY_BILLS}
+              filename="recent-transactions"
+              title="MicroPay — Recent Transactions"
+              columns={transactionColumns}
+            />
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -118,10 +187,11 @@ export default function OverviewPage() {
                     <td className="py-3 text-muted-foreground">{b.category}</td>
                     <td className="py-3 text-foreground font-medium">₹{b.amount.toLocaleString()}</td>
                     <td className="py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${b.status === "Success" ? "bg-success/10 text-success" :
-                          b.status === "Pending" ? "bg-warning/10 text-warning" :
-                            "bg-destructive/10 text-destructive"
-                        }`}>{b.status}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        b.status === "Success"  ? "bg-success/10 text-success" :
+                        b.status === "Pending"  ? "bg-warning/10 text-warning" :
+                                                  "bg-destructive/10 text-destructive"
+                      }`}>{b.status}</span>
                     </td>
                   </tr>
                 ))}
@@ -129,6 +199,7 @@ export default function OverviewPage() {
             </table>
           </div>
         </div>
+
       </div>
     </motion.div>
   );

@@ -60,6 +60,47 @@ export async function loginStaff(email, password) {
     };
 }
 
+export async function changeStaffPassword(staffId, { currentPassword, newPassword, confirmPassword }) {
+    // 1. Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "All fields are required");
+    }
+
+    if (newPassword !== confirmPassword) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "New password and confirm password do not match");
+    }
+
+    if (newPassword.length < 8) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "New password must be at least 8 characters");
+    }
+
+    if (currentPassword === newPassword) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "New password cannot be same as current password");
+    }
+
+    // 2. Get staff from DB
+    const staff = await prisma.staff.findUnique({ where: { id: staffId } });
+    if (!staff) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
+    // 3. Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, staff.password);
+    if (!isMatch) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Current password is incorrect");
+    }
+
+    // 4. Hash new password and update
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.staff.update({
+        where: { id: staffId },
+        data: { password: hashedPassword }
+    });
+
+    return { message: "Password changed successfully" };
+}
+
+
 /** [ADMIN ONLY] Create a new Manager */
 export async function createManager(adminId, data) {
     const admin = await prisma.staff.findUnique({ where: { id: adminId } });

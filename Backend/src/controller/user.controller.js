@@ -1,8 +1,17 @@
 import httpStatus from "http-status";
 import { upload } from "../config/multer.js"; // ✅ controller mein chahiye, app.js mein nahi
-import {getProfile,updateProfile,getAccountDetails,getReferralCode,getPoints,checkIn,getReferrals,} from "../services/user.service.js";
+import {
+  getProfile,
+  updateProfile,
+  verifyPhoneChange,
+  getAccountDetails,
+  getReferralCode,
+  getPoints,
+  checkIn,
+  getReferrals,
+} from "../services/user.service.js";
 import { validate } from "../middleware/validate.js";
-import { updateProfileSchema } from "../validation/user.validation.js";
+import { updateProfileSchema, verifyPhoneChangeSchema } from "../validation/user.validation.js";
 
 export const getProfileHandler = [
   async (req, res, next) => {
@@ -24,7 +33,24 @@ export const updateProfileHandler = [
       const data = await updateProfile(req.user.id, req.body, req.file,baseUrl);
       return res.status(httpStatus.OK).json({
         success: true,
-        message: "Profile updated",
+        message: data.otpSentToNewNumber ? "Profile updated; OTP sent to new number" : "Profile updated",
+        data,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+];
+
+export const verifyPhoneChangeHandler = [
+  validate(verifyPhoneChangeSchema),
+  async (req, res, next) => {
+    try {
+       const { phoneNumber, otp } = req.body;
+      const data = await verifyPhoneChange(req.user.id, req.body.otp);
+      return res.status(httpStatus.OK).json({
+        success: true,
+        message: "Phone number updated successfully",
         data,
       });
     } catch (err) {

@@ -16,22 +16,19 @@ function generateCinId() {
   return Math.floor(10000000000 + Math.random() * 90000000000).toString();
 }
 
-// const OTP_LENGTH = 4;
-// const OTP_SALT_ROUNDS = 10;
-// const MPIN_SALT_ROUNDS = 10;
-
-// function generateOtp() {
-//   const min = 10 ** (OTP_LENGTH - 1);
-//   const max = 10 ** OTP_LENGTH - 1;
-//   return String(Math.floor(Math.random() * (max - min + 1)) + min);
-// }
 const OTP_LENGTH = 4;
 const OTP_SALT_ROUNDS = 10;
 const MPIN_SALT_ROUNDS = 10;
 
 function generateOtp() {
-  return "1234";
+  const min = 10 ** (OTP_LENGTH - 1);
+  const max = 10 ** OTP_LENGTH - 1;
+  return String(Math.floor(Math.random() * (max - min + 1)) + min);
 }
+
+// function generateOtp() {
+//   return "1234";
+// }
 
 export async function loginuser(phoneNumber, countryCode, mpin) {
   const fullPhone = `${countryCode}${phoneNumber}`;
@@ -131,9 +128,11 @@ export async function sendOtpForPhone(phoneNumber, countryCode = "+91", referral
   });
 
   const smsClient = await getSmsClient();
-  const message = `Your verification code is ${otp}. It will expire in ${env.otpExpiryMinutes} minutes.`;
-
-  await smsClient.sendSms(fullPhone, message);
+  await smsClient.sendSms(
+  fullPhone,
+  `Welcome to Micrope Your verification code is ${otp} It is valid for 5 minutes. Please do not share this code with anyone. Karzpe Fintech Pvt Ltd`,
+  { dltTemplateId: process.env.DLT_TEMPLATE_OTP_REGISTRATION }
+);
 
   return { phoneNumber: fullPhone, expiresAt, otp };
 }
@@ -253,9 +252,11 @@ export async function sendOtpForForgetMpin(phoneNumber, countryCode = "+91") {
   });
 
   const smsClient = await getSmsClient();
-  const message = `Your verification code is ${otp}. It will expire in ${env.otpExpiryMinutes} minutes.`;
-
-  await smsClient.sendSms(fullPhone, message);
+  await smsClient.sendSms(
+  fullPhone,
+  `${otp} is your Micrope M-pin reset OTP. Valid for the next 5 minutes. Please do not share this code with anyone. karzpe fintech pvt ltd`,
+  { dltTemplateId: process.env.DLT_TEMPLATE_MPIN_RESET }
+);
 
   return { phoneNumber: fullPhone, expiresAt, otp };
 }

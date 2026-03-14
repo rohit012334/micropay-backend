@@ -3,6 +3,7 @@ import { authenticate } from "../middleware/authenticate.js";
 import {
   getProfileHandler,
   updateProfileHandler,
+  verifyPhoneChangeHandler,
   getAccountDetailsHandler,
   getReferralCodeHandler,
   getPointsHandler,
@@ -15,7 +16,8 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/profile", getProfileHandler);
-router.put("/profile", updateProfileHandler); 
+router.put("/profile", updateProfileHandler);
+router.post("/profile/verify-phone", verifyPhoneChangeHandler); 
 router.get("/account-details", getAccountDetailsHandler);
 router.get("/referral-code", getReferralCodeHandler);
 router.get("/points", getPointsHandler);

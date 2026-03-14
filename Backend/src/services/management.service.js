@@ -74,3 +74,93 @@ export async function createBanner(data) {
 export async function deleteBanner(id) {
     return await prisma.banner.delete({ where: { id } });
 }
+
+/** --- Category Management --- */
+
+export async function getAllCategories() {
+    return await prisma.category.findMany({
+        include: { products: true },
+        orderBy: { createdAt: "desc" }
+    });
+}
+
+export async function createCategory(data) {
+    const existing = await prisma.category.findUnique({ where: { name: data.name } });
+    if (existing) throw new ApiError(httpStatus.BAD_REQUEST, "Category with this name already exists");
+
+    return await prisma.category.create({
+        data: {
+            name: data.name,
+            imageUrl: data.imageUrl
+        }
+    });
+}
+
+export async function updateCategory(id, data) {
+    const existing = await prisma.category.findUnique({ where: { id } });
+    if (!existing) throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+
+    return await prisma.category.update({
+        where: { id },
+        data: {
+            name: data.name || existing.name,
+            imageUrl: data.imageUrl || existing.imageUrl
+        }
+    });
+}
+
+export async function deleteCategory(id) {
+    return await prisma.category.delete({ where: { id } });
+}
+
+/** --- Product Management --- */
+
+export async function getAllProducts() {
+    return await prisma.product.findMany({
+        include: { category: true },
+        orderBy: { createdAt: "desc" }
+    });
+}
+
+export async function getProductsByCategory(categoryId) {
+    return await prisma.product.findMany({
+        where: { categoryId },
+        orderBy: { createdAt: "desc" }
+    });
+}
+
+export async function createProduct(data) {
+    const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
+    if (!category) throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+
+    return await prisma.product.create({
+        data: {
+            name: data.name,
+            description: data.description,
+            imageUrl: data.imageUrl,
+            price: data.price,
+            categoryId: data.categoryId
+        }
+    });
+}
+
+export async function updateProduct(id, data) {
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+
+    return await prisma.product.update({
+        where: { id },
+        data: {
+            name: data.name || existing.name,
+            description: data.description || existing.description,
+            imageUrl: data.imageUrl || existing.imageUrl,
+            price: data.price || existing.price,
+            categoryId: data.categoryId || existing.categoryId
+        }
+    });
+}
+
+export async function deleteProduct(id) {
+    return await prisma.product.delete({ where: { id } });
+}
+

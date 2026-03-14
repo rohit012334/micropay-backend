@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Settings, Bell, Lock, Palette, Globe, Eye, EyeOff } from "lucide-react";
+import { staffApi } from "@/lib/api";
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState(null);
@@ -10,7 +11,7 @@ export default function SettingsPage() {
   const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
   const [passwordMessage, setPasswordMessage] = useState("");
 
-  const handleChangePassword = (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
     setPasswordMessage("");
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -21,14 +22,19 @@ export default function SettingsPage() {
       setPasswordMessage("New password and confirm password do not match.");
       return;
     }
-    if (newPassword.length < 6) {
-      setPasswordMessage("New password must be at least 6 characters.");
+    if (newPassword.length < 8) {
+      setPasswordMessage("New password must be at least 8 characters.");
       return;
     }
-    setPasswordMessage("Password changed successfully. (Demo – not persisted)");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      await staffApi.changePassword({ currentPassword, newPassword, confirmPassword });
+      setPasswordMessage("Password changed successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      setPasswordMessage(error.message || "Failed to change password.");
+    }
   };
 
   const items = [
@@ -113,7 +119,7 @@ export default function SettingsPage() {
                       </button>
                     </div>
                     {passwordMessage && (
-                      <p className={`text-sm ${passwordMessage.startsWith("Password changed") ? "text-success" : "text-destructive"}`}>
+                      <p className={`text-sm ${passwordMessage === "Password changed successfully." ? "text-success" : "text-destructive"}`}>
                         {passwordMessage}
                       </p>
                     )}

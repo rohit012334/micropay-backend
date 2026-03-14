@@ -12,6 +12,7 @@ import beneficiaryRoutes from "./src/routes/beneficiary.routes.js";
 import cardRoutes from "./src/routes/card.routes.js";
 import walletRoutes from "./src/routes/wallet.routes.js";
 import staffRoutes from "./src/routes/staff.routes.js";
+import masterRoutes from "./src/routes/master.routes.js";
 import { errorHandler } from "./src/middleware/errorHandler.js";
 import { cleanupExpiredKeys, cleanupOldOtps, cleanupOldSessions } from "./src/jobs/cleanup.jobs.js";
 
@@ -45,8 +46,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('/{*path}', cors(corsOptions));
 app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/uploads", express.static("uploads"));
 
 app.use("/api/auth", authRoutes);
@@ -57,6 +58,7 @@ app.use("/api/beneficiaries", beneficiaryRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/master", masterRoutes);
 
 app.use(errorHandler);
 
