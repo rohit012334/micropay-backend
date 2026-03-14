@@ -21,6 +21,8 @@ export const cleanupExpiredKeys = async () => {
  */
 export const cleanupOldOtps = async () => {
     try {
+        // Pehle KycDrafts delete kar jinke OTPs expire ho gaye
+        // (cascade ke baad yeh zaruri nahi, but defensive rakho)
         const { count } = await prisma.otp.deleteMany({
             where: {
                 OR: [
@@ -29,11 +31,10 @@ export const cleanupOldOtps = async () => {
                 ]
             }
         });
-        if (count > 0) {
-            console.log(`[OTP Cleanup] Deleted ${count} old/consumed OTPs`);
-        }
+        console.log(`[OTP Cleanup] Ran — deleted ${count} OTPs`);
     } catch (error) {
-        console.error("[OTP Cleanup] Error:", error.message);
+        // Full error log kar, sirf message nahi
+        console.error("[OTP Cleanup] Error:", error.code, error.message, error.meta);
     }
 };
 

@@ -89,7 +89,7 @@ model KycDraft {
   user           User         @relation(fields: [userId], references: [id])
   userId         String       @unique
 
-  otp            Otp          @relation(fields: [otpId], references: [id])
+  otp            Otp          @relation(fields: [otpId], references: [id], onDelete: Cascade) 
   otpId          String       @unique
 
   fullName       String
