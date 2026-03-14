@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
-import { sendOtpForPhone, verifyOtpForPhone, setupMpinForPhone, sendOtpForForgetMpin, ForgetverifyOtpForPhone, loginuser, resetMpinForPhone, logoutUser } from "../services/auth.service.js";
+import { sendOtpForPhone, verifyOtpForPhone, setupMpinForPhone, sendOtpForForgetMpin, ForgetverifyOtpForPhone, loginuser, resetMpinForPhone, logoutUser, changeMpinForUser } from "../services/auth.service.js";
 import { validate } from "../middleware/validate.js";
-import { sendOtpSchema, verifyOtpSchema, setupMpinSchema, forgetMpinSchema, ForgetverifyOtpSchema, loginSchema, resetMpinSchema } from "../validation/auth.validation.js";
+import { sendOtpSchema, verifyOtpSchema, setupMpinSchema, forgetMpinSchema, ForgetverifyOtpSchema, loginSchema, resetMpinSchema, changeMpinSchema } from "../validation/auth.validation.js";
 
 
 
@@ -73,7 +73,10 @@ export const setupMpin = [
       return res.status(httpStatus.OK).json({
         success: true,
         message: "MPIN set successfully",
-        data: result,
+        data: {
+          phoneNumber: result.phoneNumber,
+          token: result.token,
+        }
       });
     } catch (err) {
       return next(err);
@@ -144,6 +147,24 @@ export const logout = [
       return res.status(httpStatus.OK).json({
         success: true,
         message: "Logout successful",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
+
+export const changeMpin = [
+  validate(changeMpinSchema),
+  async (req, res, next) => {
+    try {
+      const { mpin } = req.body;
+      const userId = req.user.id;
+      const result = await changeMpinForUser(userId, mpin);
+      return res.status(httpStatus.OK).json({
+        success: true,
+        message: "MPIN changed successfully",
+        data: result,
       });
     } catch (err) {
       return next(err);

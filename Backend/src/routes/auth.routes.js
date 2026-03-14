@@ -1,5 +1,5 @@
 import express from "express";
-import { sendOtp, verifyOtp, setupMpin, forgetMpin, forgetMpinVerifyOtp, login, resend, resetMpin, logout } from "../controller/auth.controller.js";
+import { sendOtp, verifyOtp, setupMpin, forgetMpin, forgetMpinVerifyOtp, login, resend, resetMpin, logout, changeMpin } from "../controller/auth.controller.js";
 import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
@@ -19,6 +19,8 @@ router.post("/forget-mpin", forgetMpin);
 router.post("/forget-mpin-verify-otp", forgetMpinVerifyOtp);
 
 router.put("/reset-mpin", resetMpin);
+
+router.put("/change-mpin", authenticate, changeMpin);
 
 router.post("/logout", authenticate, logout);
 

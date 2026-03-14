@@ -65,3 +65,11 @@ export const resetMpinSchema = Joi.object({
   params: Joi.object().unknown(true),
   query: Joi.object().unknown(true),
 });
+
+export const changeMpinSchema = Joi.object({
+  body: Joi.object({
+    mpin: Joi.string().pattern(/^[0-9]{4,6}$/).min(4).required(),
+  }).required(),
+  params: Joi.object().unknown(true),
+  query: Joi.object().unknown(true),
+});

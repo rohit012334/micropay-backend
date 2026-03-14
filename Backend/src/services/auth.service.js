@@ -224,7 +224,22 @@ export async function setupMpinForPhone(phoneNumber, mpin, countryCode = "+91") 
     data: { mpinHash },
   });
 
-  return { phoneNumber: fullPhone };
+  const token = jwt.sign(
+    { userId: user.id },
+    env.jwtSecret,
+    { expiresIn: "7d" }
+  );
+
+  // Store token in DB for session verification
+  await prisma.refreshToken.create({
+    data: {
+      token,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
+  });
+  return { phoneNumber: fullPhone, token };
+
 }
 
 export async function sendOtpForForgetMpin(phoneNumber, countryCode = "+91") {
@@ -341,4 +356,21 @@ export async function logoutUser(token) {
   }
 }
 
+export async function changeMpinForUser(userId, newMpin) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const mpinHash = await bcrypt.hash(newMpin, MPIN_SALT_ROUNDS);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { mpinHash },
+  });
+
+  return { success: true };
+}
